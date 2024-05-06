@@ -53,7 +53,7 @@ namespace corrente
             return false;
         }
 
-        public CCorrente(string numero, double limite)
+        public CCorrente(string numero, double limite):this()
         {
             this.numero = numero; //atributo numero igual a parametro numero
             this.limite = limite;
