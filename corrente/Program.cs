@@ -1,59 +1,49 @@
 ﻿using corrente;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using System.Runtime.Intrinsics.Arm;
+using System.Text;
+using System.Threading.Tasks;
 
-
-CCorrente conta = new CCorrente("11234", 500);
-
-namespace corrente
+List<CCorrente>? contas=new List<CCorrente>();
+ 
+string? op;
+do
 {
-    public class Program
+    Console.WriteLine("========Menu========");
+    Console.WriteLine("1. Acesso Administrativo");
+    Console.WriteLine("2. Caixa Eletronico");
+    Console.WriteLine("3. Sair");
+    Console.Write("escolha uma opcao: ");
+    op = Console.ReadLine();
+
+    switch (op)
     {
-        static List<CCorrente> contas=new List<CCorrente>();
+        case "1": MenuAcessoAdministrativo(); break;
+        case "2":
+            Console.WriteLine("digite o numero da conta: ");
+            string? numeroConta = Console.ReadLine();
+            CCorrente? conta = contas.Find(c => c.numero == numeroConta);
 
-        public void Main(string[] args)
-        {
-            
-            string? op;
-            do
+            if (conta!=null)
             {
-                Console.WriteLine("========Menu========");
-                Console.WriteLine("1. Acesso Administrativo");
-                Console.WriteLine("2. Caixa Eletronico");
-                Console.WriteLine("3. Sair");
-                Console.Write("escolha uma opcao: ");
-                op = Console.ReadLine();
+                MenuCaixaEletronico(conta); break;
+            }
+            else
+            {
+                Console.WriteLine("a conta não existe");
+                break;
+            }
+        case "3":
+            Console.WriteLine("programa encerrado.");
+            break;
+        default: Console.WriteLine("invalido, redigite."); break;
+    }
+} while (op != "3");
 
-                switch (op)
-                {
-                    case "1": MenuAcessoAdministrativo(); break;
-                    case "2":
-                        Console.WriteLine("digite o numero da conta: ");
-                        string numeroConta = Console.ReadLine();
-
-                        if (contas.Exists(c => c.numero == numeroConta))
-                        {
-                            MenuCaixaEletronico(); break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("a conta não existe");
-                            break;
-                        }
-                    case "3":
-                        Console.WriteLine("programa encerrado.");
-                        break;
-                    default: Console.WriteLine("invalido, redigite."); break;
-                }
-            } while (op != "3");
-        }
-
-        void MenuAcessoAdministrativo()
-        {
+void MenuAcessoAdministrativo()
+{
             string? opAD;
             do
             {
@@ -83,38 +73,38 @@ namespace corrente
                         break;
                 }
             } while (opAD != "4");
-        }
+}
 
-        void CadastroContaCorrente()
-        {
+void CadastroContaCorrente()
+{
             Console.Write("Digite o número da conta: ");
-            string numero = Console.ReadLine();
+            string? numero = Console.ReadLine();
             Console.Write("Digite o limite da conta: ");
             double limite = Convert.ToDouble(Console.ReadLine());
 
-            CCorrente novaConta = new CCorrente(numero, limite);
+            CCorrente? novaConta = new CCorrente(numero, limite);
             contas.Add(novaConta);
             Console.WriteLine("Conta cadastrada com sucesso.");
-        }
+}
 
-        void MostrarSaldoContas()
-        {
+void MostrarSaldoContas()
+{
             Console.WriteLine("----- Saldo de Todas as Contas -----");
             for (int n = 0; n < contas.Count; n++) //pq nn Capacity??
             {
                 Console.WriteLine($"Conta: {contas[n + 1].numero} - Saldo: {contas[n + 1].saldo}");
             }
-        }
+}
 
-        void ExcluirConta()
-        {
+void ExcluirConta()
+{
             Console.WriteLine("digite o numero da conta a ser excluída: ");
-            string numeroConta = Console.ReadLine();
+            string? numeroConta = Console.ReadLine();
 
             Console.WriteLine("digite o limite da conta a ser excluída: ");
-            double limiteConta = Double.Parse(Console.ReadLine());
+            double? limiteConta = Double.Parse(Console.ReadLine());
 
-            CCorrente conta = contas.Find(c => c.numero == numeroConta && c.limite == limiteConta);
+            CCorrente? conta = contas.Find(c => c.numero == numeroConta && c.limite == limiteConta);
 
             if (conta!=null)
             {
@@ -127,10 +117,10 @@ namespace corrente
                 return;
             }
             
-        }
+}
 
-        void MenuCaixaEletronico()
-        {
+void MenuCaixaEletronico(CCorrente conta)
+{
             string? opCE;
             do
             {
@@ -145,13 +135,13 @@ namespace corrente
                 switch (opCE)
                 {
                     case "1":
-                        Sacar();
+                        Sacar(conta);
                         break;
                     case "2":
-                        Depositar();
+                        Depositar(conta);
                         break;
                     case "3":
-                        Transferir();
+                        Transferir(conta);
                         break;
                     case "4":
                         return;
@@ -160,57 +150,55 @@ namespace corrente
                         break;
                 }
             } while (opCE != "4");
-        }
+}
 
-        void Sacar()
-        {
-            Console.WriteLine("digite o valor do saque:");
-            double saque = Double.Parse(Console.ReadLine());
+void Sacar(CCorrente conta)
+{
+    Console.WriteLine("digite o valor do saque:");
+    double saque = Double.Parse(Console.ReadLine());
+    if(conta.Sacar(saque))
+    {
+        Console.WriteLine("Saque efetuado com sucesso");
+    }
+    else
+    {
+        Console.WriteLine("Nao foi possivel realizar o saque.");
+    }
+}
 
-            foreach (double saldo in ??)
-            {
-                if (saldo <= 0)
-                {
-                    Console.WriteLine("Não há saldo disponível.");
-                    return;
-                }
-                else if (saque > saldo)
-                {
-                    int opSaqueSaida;
-                    Console.WriteLine($"\nO valor de saque desejado que é maior que o valor do saldo da conta. Deseja retornar ao menu anterior ou sacar todo o valor" +
-                        $"presente nesta conta, de R$ {saldo} ? Caso queira voltar, digite 1. Caso contrário, digite 2.\n");
-                    Console.WriteLine("Opção escolhida: ");
-                    opSaqueSaida = Int32.Parse(Console.ReadLine());
-                    if (opSaqueSaida == 1)
-                    {
-                        Console.WriteLine("Retornando ao menu anterior...\n");
-                        return;
-                    }
-                    else if (opSaqueSaida == 2)
-                    {
-                        saque == saldo;
-                        saldo -= saque;
-                        Console.WriteLine($"\nO saque no valor de {saque} desta conta corrente foi realizado com sucesso, tornando seu saldo equivalente a {saldo} reais. ");
-                    }
-                }
-                else
-                {
-                    saldo -= valorSaque;
-                    Console.WriteLine($"\n Saque de {valorSaque} realizado com sucesso. Saldo atual da conta : R$ {saldo}.");
-                }
-            }
-        }
+void Depositar(CCorrente conta)
+{
+    double? valord;
+    Console.WriteLine("digite o valor a ser depositado:");
+    double dep = Double.Parse(Console.ReadLine());
 
-        void Depositar()
-        {
-            double valord;
+    if (conta.Depositar(dep))
+    {
+        Console.WriteLine("O deposito foi efetuado com sucesso");
+    }
+    else
+    {
+        Console.WriteLine("Nao foi possivel realizar o deposito.");
+    }
+}
 
-            //como o programa sabe q conta q é??
-        }
+ void Transferir(CCorrente conta)
+{
+    Console.WriteLine("para qual conta deseja transferir(digite o numero)?");
+    string? numdep = Console.ReadLine();
+    CCorrente? contatf = contas.Find(c => c.numero == numdep);
 
-        void Transferir()
-        {
+    Console.WriteLine("qual o valor da transferencia?");
+    double valordep = Double.Parse(Console.ReadLine());
 
-        }
+    conta.Transferir(contatf, valordep);
+
+    if (conta.Transferir(contatf, valordep))
+    {
+        Console.WriteLine("a transferencia foi efetuada com sucesso");
+    }
+    else
+    {
+        Console.WriteLine("Nao foi possivel realizar a transferencia.");
     }
 }
